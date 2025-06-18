@@ -13,6 +13,16 @@
     # Home manager
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    skarabox.url = "github:ibizaman/skarabox";
+    nixos-generators.url = "github:nix-community/nixos-generators";
+    nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
+    nixos-anywhere.url = "github:nix-community/nixos-anywhere";
+    nixos-anywhere.inputs.nixpkgs.follows = "nixpkgs";
+    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
+    deploy-rs.url = "github:serokell/deploy-rs";
+    colmena.url = "github:zhaofengli/colmena";
+    sops-nix.url = "github:Mic92/sops-nix";
   };
 
   outputs = {
@@ -24,10 +34,13 @@
   } @ inputs: flake-parts.lib.mkFlake { inherit inputs; } (let
     inherit (self) outputs;
   in {
+    imports = [
+      inputs.skarabox.flakeModules.default
+    ];
+
     # Supported systems for your flake packages, shell, etc.
     systems = [
       "aarch64-linux"
-      "i686-linux"
       "x86_64-linux"
       "aarch64-darwin"
       "x86_64-darwin"
@@ -40,6 +53,25 @@
       # Formatter for your nix files, available through 'nix fmt'
       # Other options beside 'alejandra' include 'nixpkgs-fmt'
       formatter = nixpkgs.legacyPackages.${system}.alejandra;
+    };
+
+    skarabox.hosts = {
+      myskarabox = {
+        system = ./myskarabox/system;
+        hostKeyPath = "./myskarabox/host_key";
+        hostKeyPub = ./myskarabox/host_key.pub;
+        ip = ./myskarabox/ip;
+        sshPrivateKeyPath = "./myskarabox/ssh";
+        sshPublicKey = ./myskarabox/ssh.pub;
+        knownHosts = ./myskarabox/known_hosts;
+        knownHostsPath = "./myskarabox/known_hosts";
+        secretsFilePath = "./myskarabox/secrets.yaml";
+
+        modules = [
+          inputs.sops-nix.nixosModules.default
+          ./myskarabox/configuration.nix
+        ];
+      };
     };
 
     flake = {

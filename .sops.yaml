@@ -1,0 +1,9 @@
+keys:
+- &myskarabox age1xeqjnq5vzxdl2cdjaj6gmkwcfhn0v2pj264nt7ngveujkqa0cstsqdet3d
+- &main age1yvk0fmpvusgy8fdq074mm3nhlgdsxj58qj42w52kr5f08zvalpmqs8zqt6
+creation_rules:
+- path_regex: myskarabox/secrets.yaml
+  key_groups:
+  - age:
+    - *myskarabox
+    - *main
